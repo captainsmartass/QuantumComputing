@@ -1,0 +1,47 @@
+function [Partial_Transpose,Negativity] = ptranspose(A,m,n);
+% This function takes a bipartite density matrix A and submatrix dimensions 
+% m,n. It then calculates partial transpose, its eigenvalues and if the 
+% partial transpose is square, negativity. Matlab can only find eigenvalues
+% of a square matrix. This is accomplished by separating the density matrix's
+% indices into submatrices of size m,n and taking their transpose. If any of
+% the eigenvalues are negative, A is not a physically acceptable state. If 
+% Negativity is not 0, the state is inseperable. If the  If the negativity is
+% positive the state is inseperable.
+
+s = size(A);
+x = s(1,1)/n;
+y = s(1,2)/n;
+
+b= zeros(n*m);
+c = zeros(n,n);
+        
+        for i = 1:x;      
+        
+            for j = 1:y;
+                
+                t = A(((n*(i-1)+1):n*i),(((n*(j-1)+1)):n*j));
+                T = t';
+                b(((n*(i-1)+1):n*i),(((n*(j-1)+1)):n*j)) = T;
+                
+                if i ~= j
+                
+               c((((n*(j-1)+1)):n*j),((n*(i-1)+1):n*i)) = t;
+               
+                end
+                
+                 if i == j
+                 
+               c((((n*(j-1)+1)):n*j),((n*(i-1)+1):n*i)) = c((((n*(j-1)+1)):n*j),((n*(i-1)+1):n*i)) + t;
+               
+           end
+                  
+          end
+        
+        end
+         
+        ptr_1 = c
+        
+        ptr_2 = b
+        
+    
+end
