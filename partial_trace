@@ -1,0 +1,34 @@
+function [ret] = ptrace(A,m,n);
+%The following calculates partial trace by dividing A into submatrices 
+%and taking trace of these submatrices and putting the trace into a new
+%matrix.
+ 
+    s = size(A);
+    x = s(1,1)/n;
+    y = s(1,2)/n;
+    b = [];
+    c = [];
+    tr_1m = zeros(n,n);
+    
+    for i = 1:x
+            
+            for j = 1:y
+ 
+             t = A(((n*(i-1)+1):n*i),(((n*(j-1)+1)):n*j));
+             b(i,j) = trace(t);
+             
+           if i == j
+           
+               tr_1m = tr_1m + t;
+               
+           end
+           end
+        
+    
+        
+    end
+    
+    tr_2 = b
+    tr_1 = tr_1m
+
+end
