@@ -1,0 +1,12 @@
+function [Fidelity] = Fidelity(rho_1,rho_2);
+%rho_1 should be chosen such that the square roots of its eigenvalues are
+%positive semidefinite. The calculation of fidelity here is straightforward 
+%upon viewing the equation.
+c = sqrtm(rho_1);
+if size(rho_1) == size(rho_2)
+    
+    Fidelity = trace(sqrtm(c*rho_2*c));
+else
+    fprintf('Enter density matrices of same state space')
+end
+end
