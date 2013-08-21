@@ -1,0 +1,179 @@
+function [U_p] = twolevdec(~)
+    %input a 4x4 unitary matrix
+    v = input('Please enter a square unitary matrix:')
+    %v = (0.5)*[1 1 1 1
+     %   1 1i -1 -1i
+    %    1 -1 1 -1
+     %   1 -1i -1 1i];
+    [col,row] = size(v);
+    
+  
+    p = col*(col-1)/2;
+    
+    
+
+    for k = 1:(p/3)
+        if k ==1 
+        u = sqrt(v(1,1)^2 + v(2,1)^2);
+        id = eye(col-k+1);
+        
+        for i = 1:(col-k+1);
+            
+           for j = 1:(row-k+1);
+               U1(1:i,1:j) = id(1:i,1:j);%for n-case, use double and an index to identify U, must find algorithm for indices when mapping to formula
+    
+               U2(1:i,1:j) = id(1:i,1:j);
+    
+               U3(1:i,1:j) = id(1:i,1:j);
+               
+           end
+        end
+            
+
+    
+    Umap_1 = [conj(v(1,1))/u conj(v(2,1))/u
+                -v(2,1)/u v(1,1)/u];
+            
+    U1(1,1) = Umap_1(1,1);
+    U1(2,1) = Umap_1(2,1);
+    U1(1,2) = Umap_1(1,2);
+    U1(2,2) = Umap_1(2,2);
+    
+    step1 = U1*v;
+
+    s = sqrt(abs(step1(1,1))^2 + abs(step1(3,1))^2);
+
+    Umap_2 = [conj(step1(1,1))/s 0 conj(step1(3,1))/s 0
+            0 1 0 0
+            -step1(3,1)/s 0 step1(1,1)/s 0
+            0 0 0 1];
+
+    U2(1,1) = Umap_2(1,1);
+    U2(1,3) = Umap_2(1,3);
+    U2(3,1) = Umap_2(3,1);
+    U2(3,3) = Umap_2(3,3);
+
+    step2 = U2*U1*v;
+
+    d = sqrt(abs(step2(1,1))^2 + abs(step2(4,1))^2);
+
+    Umap_3 = [conj(step2(1,1))/d 0 0 conj(step2(4,1))/d 
+            0 1 0 0 
+            0 0 1 0
+            -step2(4,1)/d 0 0 step2(1,1)/d];
+
+
+
+    U3(1,1) = Umap_3(1,1);
+    U3(1,4) = Umap_3(1,4);
+    U3(4,1) = Umap_3(4,1);
+    U3(4,4) = Umap_3(4,4);
+    
+    step3 = U3*U2*U1*v;
+    
+    [col2,row2] = size(step3);
+    y = col2-1;
+    R= eye(y);
+    for i = 1:col2
+        for j = 1:col2
+    R(1:(i-1),1:(j-1)) = step3(2:i,2:j);
+        end
+    end
+    
+        end
+    
+    if k == 2
+    
+        id = eye(col-k+1);
+        
+        for i = 1:(col-k+1);
+            
+           for j = 1:(row-k+1);
+               M1(1:i,1:j) = id(1:i,1:j);
+    
+               M2(1:i,1:j) = id(1:i,1:j);
+    
+               M3(1:i,1:j) = id(1:i,1:j);
+               
+           end
+        end
+             
+    W = R*ctranspose(R);
+    u = sqrt(abs(R(1,1))^2 + abs(R(2,1))^2);
+   
+    Umap_1 = [ctranspose(R(1,1))/u ctranspose(R(2,1))/u
+                -R(2,1)/u R(1,1)/u];
+            
+    M1(1,1) = Umap_1(1,1);
+    M1(2,1) = Umap_1(2,1);
+    M1(1,2) = Umap_1(1,2);
+    M1(2,2) = Umap_1(2,2);
+    
+    
+    
+    step1 = M1*R';
+    f = abs(step1(1,1))^2;
+    s2 = sqrt(abs(step1(1,1))^2 + abs(step1(3,1))^2 );
+    
+    Umap_2 = [conj(step1(1,1))/s2 0 conj(step1(3,1))/s2 0
+            0 1 0 0
+            -step1(3,1)/s2 0 step1(1,1)/s2 0
+            0 0 0 1];
+
+    M2(1,1) = Umap_2(1,1);
+    M2(1,3) = Umap_2(1,3);
+    M2(3,1) = Umap_2(3,1);
+    M2(3,3) = Umap_2(3,3);
+    
+    step2 = M2*M1*R;
+
+    d2 = sqrt(abs(step2(1,1))^2 + abs(step2(3,1))^2);
+
+    Umap_3 = [conj(step2(1,1))/d2 0 0 conj(step2(3,1))/d2 
+            0 1 0 0 
+            0 0 1 0
+            -step2(3,1)/d2 0 0 step2(1,1)/d2];
+    
+
+
+
+    %M3(1,1) = Umap_3(1,1);
+    %M3(1,3) = Umap_3(1,4);
+    %M3(3,1) = Umap_3(4,1);
+    %M3(3,3) = Umap_3(4,4);
+    
+    M3 = ctranspose(M2*M1*R);
+    step3new = M3*M2*M1*R;
+    eh = ctranspose(M2*M1*R);
+    
+
+   
+    huh = abs(R(1,1)^2) + abs(R(1,3)^2);
+    
+    U1
+    U2
+    U3
+    U4 = [1 0 0 0
+        0 M1(1,1) M1(1,2) M1(1,3)
+        0 M1(2,1) M1(2,2) M1(2,3)
+        0 M1(3,1) M1(3,2) M1(3,3)]
+    
+    U5 = [1 0 0 0
+        0 M2(1,1) M2(1,2) M2(1,3)
+        0 M2(2,1) M2(2,2) M2(2,3)
+        0 M2(3,1) M2(3,2) M2(3,3)]
+    
+    U6 = [1 0 0 0
+        0 M3(1,1) M3(1,2) M3(1,3)
+        0 M3(2,1) M3(2,2) M3(2,3)
+        0 M3(3,1) M3(3,2) M3(3,3)]
+    
+    %the following line is a check
+    
+    %U6U5U4U3U2U1V = U6*U5*U4*U3*U2*U1*v
+    
+
+    end
+
+        end
+    end
