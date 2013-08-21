@@ -1,0 +1,51 @@
+function [ W ] = Schmidt( v,m,n );
+% Input column vector bipartite density matrix, v and desired m,n such that 
+% m*n = dim(v). The density matrix is the tensor of two hilbert spaces 
+% by definition. This function returns the Schmidt number and associated 
+% bases separated by a line with the index of the schmidt number and finally
+% the same bipartite density matrix in the dimensions mxn. This new bipartite 
+% density matrix is the product of the Schmidt number and associated bases.
+
+e_m = eye(m);
+    e_n = eye(n);
+
+    h = 0;
+    for i = 1:m;
+        
+        for j = 1:n;
+            
+            h = h+1;
+            e_i = e_m(:,i);
+            e_j = e_n(:,j);
+            K = kron(e_i, e_j);
+            s = ctranspose(K)*v;
+            x = ctranspose(K)*v;
+            W(i,j) = x;
+            Q = {e_i,e_j,s};
+            ei = Q{1};
+            ej = Q{2};
+            ex = Q{3};
+            m = {ei,ej,ex}; 
+            
+        end
+    end
+
+[r,f,o] = svd(W);
+if size(e_n) > size(e_m);
+    ms = size(e_m);
+min_dim = ms(1,1);
+end
+if size(e_m)>=size(e_n);
+    ns = size(e_n);
+    min_dim = ns(1,1);
+end
+fprintf('v is the sum of s_i*k, where k is the tensor of the ith row in sigma and ith column in V of SVD of input vector%g.\n')
+
+for i = 1:min_dim;
+    
+    s_i = f(i,i)
+    u_i = r(:,i);
+    v_i = o(:,i);%returns unitary matrices such that x = u*s*v' so we take column instead of row
+    k = kron(u_i,v_i)
+    
+end
